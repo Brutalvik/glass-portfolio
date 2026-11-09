@@ -1,16 +1,76 @@
 @import "tailwindcss";
 
-@config "../tailwind.config.js";
+/* ---------- Theme tokens ----------
+   data-theme is set on <html> from the current background scene:
+   dark glass for dawn/evening/night, light glass for daytime. */
 
-:root {
+:root,
+[data-theme="dark"] {
+  --ink: #ffffff;
+  --paper: #0b0d17;
   --glass-tint: rgba(16, 18, 28, 0.26);
   --glass-tint-strong: rgba(16, 18, 28, 0.42);
+  --glass-sheen-a: rgba(255, 255, 255, 0.16);
+  --glass-sheen-b: rgba(255, 255, 255, 0.05);
+  --glass-sheen-c: rgba(255, 255, 255, 0.09);
   --glass-edge: rgba(255, 255, 255, 0.22);
   --glass-edge-soft: rgba(255, 255, 255, 0.08);
+  --glass-rim: rgba(255, 255, 255, 0.55);
+  --glass-inset: rgba(255, 255, 255, 0.38);
+  --glass-shadow: rgba(0, 0, 0, 0.55);
+  --glass-solid: rgba(22, 24, 36, 0.94);
+  --chip-bg: rgba(255, 255, 255, 0.09);
+  --chip-bg-hover: rgba(255, 255, 255, 0.18);
+  --chip-border: rgba(255, 255, 255, 0.12);
+  --veil-top: rgba(0, 0, 0, 0.45);
+  --veil-mid: rgba(0, 0, 0, 0.3);
+  --veil-bottom: rgba(0, 0, 0, 0.6);
+  --scrim: rgba(0, 0, 0, 0.45);
+  --text-glow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 24px rgba(0, 0, 0, 0.45);
+  --title-shadow: drop-shadow(0 2px 14px rgba(0, 0, 0, 0.35));
+  --logo-filter: brightness(0) invert(1);
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --ink: #0e1222;
+  --paper: #ffffff;
+  --glass-tint: rgba(255, 255, 255, 0.34);
+  --glass-tint-strong: rgba(255, 255, 255, 0.5);
+  --glass-sheen-a: rgba(255, 255, 255, 0.55);
+  --glass-sheen-b: rgba(255, 255, 255, 0.18);
+  --glass-sheen-c: rgba(255, 255, 255, 0.3);
+  --glass-edge: rgba(255, 255, 255, 0.85);
+  --glass-edge-soft: rgba(255, 255, 255, 0.5);
+  --glass-rim: rgba(255, 255, 255, 0.95);
+  --glass-inset: rgba(255, 255, 255, 0.9);
+  --glass-shadow: rgba(20, 40, 80, 0.28);
+  --glass-solid: rgba(246, 248, 252, 0.96);
+  --chip-bg: rgba(255, 255, 255, 0.45);
+  --chip-bg-hover: rgba(255, 255, 255, 0.75);
+  --chip-border: rgba(14, 18, 34, 0.08);
+  --veil-top: rgba(255, 255, 255, 0.22);
+  --veil-mid: rgba(255, 255, 255, 0.12);
+  --veil-bottom: rgba(10, 20, 40, 0.25);
+  --scrim: rgba(255, 255, 255, 0.8);
+  --text-glow: 0 1px 1px rgba(255, 255, 255, 0.5), 0 0 24px rgba(255, 255, 255, 0.55);
+  --title-shadow: drop-shadow(0 1px 12px rgba(255, 255, 255, 0.6));
+  --logo-filter: brightness(0);
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter Variable",
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+:root {
   --glass-blur: 28px;
   --glass-sat: 180%;
   --ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
-  color-scheme: dark;
 }
 
 html {
@@ -22,15 +82,37 @@ html {
 body {
   /* No background here: it would paint over the fixed -z-10 backdrop */
   background: transparent;
-  color: rgba(255, 255, 255, 0.92);
-  font-family:
-    -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
-    "Inter Variable", "Helvetica Neue", Arial, sans-serif;
+  color: var(--ink);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  transition: color 800ms var(--ease-apple);
 }
 
 ::selection {
-  background: rgba(255, 255, 255, 0.28);
+  background: color-mix(in oklab, var(--ink) 25%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 12px;
+}
+
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: -4rem;
+  z-index: 100;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 500;
+  transition: top 200ms var(--ease-apple);
+}
+
+.skip-link:focus {
+  top: 1rem;
 }
 
 /* ---------- Liquid glass surfaces ---------- */
@@ -41,22 +123,25 @@ body {
   background:
     linear-gradient(
       140deg,
-      rgba(255, 255, 255, 0.16) 0%,
-      rgba(255, 255, 255, 0.05) 38%,
-      rgba(255, 255, 255, 0.02) 62%,
-      rgba(255, 255, 255, 0.09) 100%
+      var(--glass-sheen-a) 0%,
+      var(--glass-sheen-b) 38%,
+      transparent 62%,
+      var(--glass-sheen-c) 100%
     ),
     var(--glass-tint);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
   border: 1px solid var(--glass-edge-soft);
   box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.38),
-    inset 0 -1px 0 0 rgba(255, 255, 255, 0.06),
-    inset 1px 0 0 0 rgba(255, 255, 255, 0.1),
-    0 1px 2px rgba(0, 0, 0, 0.12),
-    0 20px 50px -18px rgba(0, 0, 0, 0.55);
+    inset 0 1px 0 0 var(--glass-inset),
+    inset 0 -1px 0 0 color-mix(in oklab, var(--glass-inset) 18%, transparent),
+    inset 1px 0 0 0 color-mix(in oklab, var(--glass-inset) 30%, transparent),
+    0 1px 2px rgba(0, 0, 0, 0.1),
+    0 20px 50px -18px var(--glass-shadow);
   overflow: hidden;
+  transition:
+    background 800ms var(--ease-apple),
+    border-color 800ms var(--ease-apple);
 }
 
 /* Bright rim that fades along the edge, like light catching curved glass */
@@ -68,10 +153,10 @@ body {
   padding: 1px;
   background: linear-gradient(
     150deg,
-    rgba(255, 255, 255, 0.55),
-    rgba(255, 255, 255, 0.08) 30%,
-    rgba(255, 255, 255, 0) 55%,
-    rgba(255, 255, 255, 0.18) 100%
+    var(--glass-rim),
+    color-mix(in oklab, var(--glass-rim) 15%, transparent) 30%,
+    transparent 55%,
+    color-mix(in oklab, var(--glass-rim) 35%, transparent) 100%
   );
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
@@ -82,7 +167,7 @@ body {
   z-index: 1;
 }
 
-/* Pointer-following specular highlight (driven by --mx / --my from GlassCard) */
+/* Pointer-following specular highlight (driven by --mx / --my from <Glass>) */
 .glass::after {
   content: "";
   position: absolute;
@@ -90,8 +175,8 @@ body {
   border-radius: inherit;
   background: radial-gradient(
     520px circle at var(--mx, 50%) var(--my, -20%),
-    rgba(255, 255, 255, 0.14),
-    rgba(255, 255, 255, 0) 45%
+    rgba(255, 255, 255, 0.16),
+    transparent 45%
   );
   opacity: var(--glow, 0);
   transition: opacity 400ms var(--ease-apple);
@@ -113,16 +198,28 @@ body {
   transition:
     transform 500ms var(--ease-apple),
     box-shadow 500ms var(--ease-apple),
-    border-color 500ms var(--ease-apple);
+    border-color 500ms var(--ease-apple),
+    opacity 400ms var(--ease-apple);
 }
 
 .glass-interactive:hover {
   transform: translateY(-3px);
   border-color: var(--glass-edge);
+}
+
+/* Cards matching the selected skill */
+.is-match {
+  border-color: var(--glass-edge);
   box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.45),
-    inset 0 -1px 0 0 rgba(255, 255, 255, 0.08),
-    0 30px 70px -20px rgba(0, 0, 0, 0.6);
+    inset 0 1px 0 0 var(--glass-inset),
+    0 0 0 1.5px color-mix(in oklab, var(--ink) 55%, transparent),
+    0 24px 60px -18px var(--glass-shadow);
+}
+
+/* Dim the content, not the glass: opacity on a backdrop-filter element fades the blur too */
+.is-dimmed > * {
+  opacity: 0.4;
+  transition: opacity 400ms var(--ease-apple);
 }
 
 /* Chips live inside glass, so no nested backdrop-filter (it does not compose) */
@@ -134,27 +231,43 @@ body {
   border-radius: 999px;
   font-size: 0.8125rem;
   line-height: 1.25rem;
-  color: rgba(255, 255, 255, 0.9);
-  background: rgba(255, 255, 255, 0.09);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  color: color-mix(in oklab, var(--ink) 90%, transparent);
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--glass-inset) 45%, transparent);
   transition:
     background 300ms var(--ease-apple),
+    color 300ms var(--ease-apple),
     transform 300ms var(--ease-apple);
 }
 
-.chip:hover {
-  background: rgba(255, 255, 255, 0.18);
+button.chip {
+  cursor: pointer;
+}
+
+button.chip:hover {
+  background: var(--chip-bg-hover);
   transform: translateY(-1px);
 }
 
+.chip[aria-pressed="true"],
+button.chip[aria-pressed="true"]:hover {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: transparent;
+}
+
 .text-gradient {
-  background: linear-gradient(180deg, #ffffff 20%, rgba(255, 255, 255, 0.62));
+  background: linear-gradient(
+    180deg,
+    var(--ink) 20%,
+    color-mix(in oklab, var(--ink) 62%, transparent)
+  );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   /* drop-shadow, not text-shadow: text-shadow bleeds through transparent clipped text */
-  filter: drop-shadow(0 2px 14px rgba(0, 0, 0, 0.35));
+  filter: var(--title-shadow);
 }
 
 .eyebrow {
@@ -162,13 +275,104 @@ body {
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.6);
+  color: color-mix(in oklab, var(--ink) 62%, transparent);
 }
 
-.text-shadow-soft {
-  text-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.35),
-    0 2px 24px rgba(0, 0, 0, 0.45);
+.text-glow {
+  text-shadow: var(--text-glow);
+}
+
+/* Soft radial scrim behind text that sits directly on the photo */
+.scrim {
+  position: relative;
+  isolation: isolate;
+}
+
+.scrim::before {
+  content: "";
+  position: absolute;
+  inset: -16% -20%;
+  z-index: -1;
+  background: radial-gradient(
+    closest-side,
+    var(--scrim),
+    color-mix(in oklab, var(--scrim) 45%, transparent) 55%,
+    transparent
+  );
+  filter: blur(20px);
+  pointer-events: none;
+  transition: background 800ms var(--ease-apple);
+}
+
+.logo-mark {
+  filter: var(--logo-filter);
+  opacity: 0.85;
+}
+
+.veil {
+  background: linear-gradient(
+    180deg,
+    var(--veil-top),
+    var(--veil-mid) 45%,
+    var(--veil-bottom)
+  );
+  transition: background 1200ms var(--ease-apple);
+}
+
+/* Range input styled as an Apple-like slider */
+.scene-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--ink) 22%, transparent);
+}
+
+.scene-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.35),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+}
+
+.scene-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+
+.field {
+  width: 100%;
+  border-radius: 16px;
+  padding: 0.8rem 1rem;
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+  transition:
+    background 300ms var(--ease-apple),
+    border-color 300ms var(--ease-apple);
+}
+
+.field::placeholder {
+  color: color-mix(in oklab, var(--ink) 45%, transparent);
+}
+
+.field:focus {
+  outline: none;
+  background: var(--chip-bg-hover);
+  border-color: var(--glass-edge);
 }
 
 /* Slow drift on the backdrop */
@@ -185,10 +389,25 @@ body {
   animation: drift 40s ease-in-out infinite alternate;
 }
 
-/* Fallback when backdrop-filter is unsupported */
+/* Fallbacks: no backdrop-filter support, or the user asked for less transparency */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .glass {
-    background: rgba(22, 24, 36, 0.86);
+    background: var(--glass-solid);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background: var(--glass-solid);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .glass::after {
+    display: none;
+  }
+  .chip,
+  .field {
+    background: color-mix(in oklab, var(--ink) 10%, var(--paper));
   }
 }
 
@@ -200,7 +419,7 @@ body {
     animation: none;
   }
   .glass-interactive:hover,
-  .chip:hover {
+  button.chip:hover {
     transform: none;
   }
 }

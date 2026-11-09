@@ -2,62 +2,62 @@
 
 import { useEffect, useState } from "react";
 
-import {
-  BackgroundKey,
-  backgroundLqip,
-  backgroundSrc,
-  getBackgroundKey,
-} from "@/config/background-map";
+import { useScene } from "@/components/scene-provider";
+import { bgLqip, bgSrc, bgSrcSet } from "@/config/background-map";
 
-type Layer = { key: BackgroundKey; id: number };
+type Layer = { key: string; id: number };
+
+let layerId = 0;
 
 export function TimeBackground() {
+  const { index, scene } = useScene();
   const [layers, setLayers] = useState<Layer[]>([]);
-  const [loaded, setLoaded] = useState<Record<string, boolean>>({});
+  const [loaded, setLoaded] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
-    let id = 0;
-    const apply = () => {
-      const key = getBackgroundKey(new Date().getHours());
+    if (index < 0) return;
+    setLayers((prev) => {
+      if (prev.length && prev[prev.length - 1].key === scene.key) return prev;
 
-      setLayers((prev) => {
-        if (prev.length && prev[prev.length - 1].key === key) return prev;
-
-        // Keep the previous layer underneath while the new one fades in
-        return [...prev.slice(-1), { key, id: ++id }];
-      });
-    };
-
-    apply();
-    const t = window.setInterval(apply, 60_000);
-
-    return () => window.clearInterval(t);
-  }, []);
+      // Keep the previous layer underneath while the new one fades in
+      return [...prev.slice(-1), { key: scene.key, id: ++layerId }];
+    });
+  }, [index, scene.key]);
 
   return (
-    <div aria-hidden className="fixed inset-0 -z-10 overflow-hidden bg-[#0b0d17]">
-      {layers.map((layer) => (
-        <div key={layer.id} className="absolute inset-0">
-          {/* Tiny blurred placeholder shows instantly */}
-          <div
-            className="absolute inset-0 scale-110 bg-cover bg-center blur-2xl"
-            style={{ backgroundImage: `url(${backgroundLqip(layer.key)})` }}
-          />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            alt=""
-            className="bg-drift absolute inset-0 h-full w-full object-cover transition-opacity duration-[1600ms] ease-out"
-            decoding="async"
-            src={backgroundSrc(layer.key)}
-            style={{ opacity: loaded[layer.id] ? 1 : 0 }}
-            onLoad={() => setLoaded((s) => ({ ...s, [layer.id]: true }))}
-          />
-        </div>
-      ))}
+    <div
+      aria-hidden
+      className="fixed inset-0 -z-10 overflow-hidden bg-[#0b0d17]"
+    >
+      {layers.map((layer, i) => {
+        const isTop = i === layers.length - 1;
 
-      {/* Legibility veil: keeps white text readable on bright daytime frames */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/30 to-black/60" />
-      <div className="absolute inset-0 [background:radial-gradient(120%_80%_at_50%_0%,transparent_40%,rgba(0,0,0,0.35)_100%)]" />
+        return (
+          <div key={layer.id} className="absolute inset-0">
+            {isTop && !loaded[layer.id] && (
+              <div
+                className="absolute inset-0 scale-110 bg-cover bg-center blur-2xl"
+                style={{ backgroundImage: `url(${bgLqip(layer.key)})` }}
+              />
+            )}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              alt=""
+              className="bg-drift absolute inset-0 h-full w-full object-cover transition-opacity duration-[1400ms] ease-out"
+              decoding="async"
+              {...{ fetchpriority: isTop ? "high" : "low" }}
+              sizes="100vw"
+              src={bgSrc(layer.key, 1280)}
+              srcSet={bgSrcSet(layer.key)}
+              style={{ opacity: loaded[layer.id] ? 1 : 0 }}
+              onLoad={() => setLoaded((s) => ({ ...s, [layer.id]: true }))}
+            />
+          </div>
+        );
+      })}
+
+      {/* Legibility veil, tuned per theme in globals.css */}
+      <div className="veil absolute inset-0" />
     </div>
   );
 }

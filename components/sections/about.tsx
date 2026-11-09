@@ -25,20 +25,20 @@ export function About() {
       <div className="grid gap-5 lg:grid-cols-5">
         <Reveal className="lg:col-span-3">
           <Glass className="h-full rounded-[32px] p-8 md:p-10">
-            <div className="space-y-5 text-[17px] leading-relaxed text-white/80">
+            <div className="space-y-5 text-[17px] leading-relaxed text-ink/85">
               {profile.summary.map((p) => (
                 <p key={p}>{p}</p>
               ))}
             </div>
             <div className="mt-8">
               <p className="eyebrow mb-3">Worked with</p>
-              <div className="flex flex-wrap gap-2">
+              <ul className="flex flex-wrap gap-2">
                 {profile.clients.map((c) => (
-                  <span key={c} className="chip">
+                  <li key={c} className="chip">
                     {c}
-                  </span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           </Glass>
         </Reveal>
@@ -47,8 +47,8 @@ export function About() {
           {pillars.map((p, i) => (
             <Reveal key={p.title} delay={0.08 * (i + 1)}>
               <Glass interactive className="h-full rounded-[28px] p-6">
-                <h3 className="text-lg font-semibold text-white">{p.title}</h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-white/70">
+                <h3 className="text-lg font-semibold text-ink">{p.title}</h3>
+                <p className="mt-2 text-[15px] leading-relaxed text-ink/75">
                   {p.body}
                 </p>
               </Glass>
