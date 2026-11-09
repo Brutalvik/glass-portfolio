@@ -1,3 +1,206 @@
 @import "tailwindcss";
 
-@config "../tailwind.config.js"
+@config "../tailwind.config.js";
+
+:root {
+  --glass-tint: rgba(16, 18, 28, 0.26);
+  --glass-tint-strong: rgba(16, 18, 28, 0.42);
+  --glass-edge: rgba(255, 255, 255, 0.22);
+  --glass-edge-soft: rgba(255, 255, 255, 0.08);
+  --glass-blur: 28px;
+  --glass-sat: 180%;
+  --ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
+  color-scheme: dark;
+}
+
+html {
+  background: #0b0d17;
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+}
+
+body {
+  /* No background here: it would paint over the fixed -z-10 backdrop */
+  background: transparent;
+  color: rgba(255, 255, 255, 0.92);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+    "Inter Variable", "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* ---------- Liquid glass surfaces ---------- */
+
+.glass {
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(
+      140deg,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0.05) 38%,
+      rgba(255, 255, 255, 0.02) 62%,
+      rgba(255, 255, 255, 0.09) 100%
+    ),
+    var(--glass-tint);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  border: 1px solid var(--glass-edge-soft);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.38),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.06),
+    inset 1px 0 0 0 rgba(255, 255, 255, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.12),
+    0 20px 50px -18px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+/* Bright rim that fades along the edge, like light catching curved glass */
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    150deg,
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0.08) 30%,
+    rgba(255, 255, 255, 0) 55%,
+    rgba(255, 255, 255, 0.18) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Pointer-following specular highlight (driven by --mx / --my from GlassCard) */
+.glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    520px circle at var(--mx, 50%) var(--my, -20%),
+    rgba(255, 255, 255, 0.14),
+    rgba(255, 255, 255, 0) 45%
+  );
+  opacity: var(--glow, 0);
+  transition: opacity 400ms var(--ease-apple);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glass > * {
+  position: relative;
+  z-index: 2;
+}
+
+.glass-strong {
+  --glass-tint: var(--glass-tint-strong);
+  --glass-blur: 40px;
+}
+
+.glass-interactive {
+  transition:
+    transform 500ms var(--ease-apple),
+    box-shadow 500ms var(--ease-apple),
+    border-color 500ms var(--ease-apple);
+}
+
+.glass-interactive:hover {
+  transform: translateY(-3px);
+  border-color: var(--glass-edge);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 0 rgba(255, 255, 255, 0.08),
+    0 30px 70px -20px rgba(0, 0, 0, 0.6);
+}
+
+/* Chips live inside glass, so no nested backdrop-filter (it does not compose) */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition:
+    background 300ms var(--ease-apple),
+    transform 300ms var(--ease-apple);
+}
+
+.chip:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.text-gradient {
+  background: linear-gradient(180deg, #ffffff 20%, rgba(255, 255, 255, 0.62));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* drop-shadow, not text-shadow: text-shadow bleeds through transparent clipped text */
+  filter: drop-shadow(0 2px 14px rgba(0, 0, 0, 0.35));
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.text-shadow-soft {
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.35),
+    0 2px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* Slow drift on the backdrop */
+@keyframes drift {
+  0% {
+    transform: scale(1.06) translate3d(0, 0, 0);
+  }
+  100% {
+    transform: scale(1.12) translate3d(-1.5%, -1%, 0);
+  }
+}
+
+.bg-drift {
+  animation: drift 40s ease-in-out infinite alternate;
+}
+
+/* Fallback when backdrop-filter is unsupported */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: rgba(22, 24, 36, 0.86);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .bg-drift {
+    animation: none;
+  }
+  .glass-interactive:hover,
+  .chip:hover {
+    transform: none;
+  }
+}

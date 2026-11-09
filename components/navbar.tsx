@@ -1,141 +1,146 @@
-import {
-  Navbar as HeroUINavbar,
-  NavbarContent,
-  NavbarMenu,
-  NavbarMenuToggle,
-  NavbarBrand,
-  NavbarItem,
-  NavbarMenuItem,
-} from "@heroui/navbar";
-import { Button } from "@heroui/button";
-import { Kbd } from "@heroui/kbd";
-import { Link } from "@heroui/link";
-import { Input } from "@heroui/input";
-import { link as linkStyles } from "@heroui/theme";
-import NextLink from "next/link";
+"use client";
+
 import clsx from "clsx";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
+import { Glass } from "@/components/glass";
+import { GithubIcon } from "@/components/icons";
+import { profile } from "@/config/resume";
 import { siteConfig } from "@/config/site";
-import { ThemeSwitch } from "@/components/theme-switch";
-import {
-  TwitterIcon,
-  GithubIcon,
-  DiscordIcon,
-  HeartFilledIcon,
-  SearchIcon,
-  Logo,
-} from "@/components/icons";
 
-export const Navbar = () => {
-  const searchInput = (
-    <Input
-      aria-label="Search"
-      classNames={{
-        inputWrapper: "bg-default-100",
-        input: "text-sm",
-      }}
-      endContent={
-        <Kbd className="hidden lg:inline-block" keys={["command"]}>
-          K
-        </Kbd>
-      }
-      labelPlacement="outside"
-      placeholder="Search..."
-      startContent={
-        <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
-      }
-      type="search"
-    />
-  );
+export function Navbar() {
+  const [active, setActive] = useState<string>("");
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const ids = siteConfig.navItems.map((i) => i.href.slice(1));
+    const els = ids
+      .map((id) => document.getElementById(id))
+      .filter(Boolean) as HTMLElement[];
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) setActive(e.target.id);
+        });
+      },
+      { rootMargin: "-45% 0px -50% 0px" },
+    );
+
+    els.forEach((el) => io.observe(el));
+
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <HeroUINavbar maxWidth="xl" position="sticky">
-      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-        <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href="/">
-            <Logo />
-            <p className="font-bold text-inherit">ACME</p>
-          </NextLink>
-        </NavbarBrand>
-        <ul className="hidden lg:flex gap-4 justify-start ml-2">
-          {siteConfig.navItems.map((item) => (
-            <NavbarItem key={item.href}>
-              <NextLink
-                className={clsx(
-                  linkStyles({ color: "foreground" }),
-                  "data-[active=true]:text-primary data-[active=true]:font-medium",
-                )}
-                color="foreground"
-                href={item.href}
-              >
-                {item.label}
-              </NextLink>
-            </NavbarItem>
-          ))}
-        </ul>
-      </NavbarContent>
-
-      <NavbarContent
-        className="hidden sm:flex basis-1/5 sm:basis-full"
-        justify="end"
+    <header className="fixed inset-x-0 top-4 z-50 flex justify-center px-4">
+      <Glass
+        strong
+        as="nav"
+        className="flex w-full max-w-3xl items-center justify-between gap-2 rounded-full py-2 pl-5 pr-2"
       >
-        <NavbarItem className="hidden sm:flex gap-2">
-          <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
-            <TwitterIcon className="text-default-500" />
-          </Link>
-          <Link isExternal aria-label="Discord" href={siteConfig.links.discord}>
-            <DiscordIcon className="text-default-500" />
-          </Link>
-          <Link isExternal aria-label="Github" href={siteConfig.links.github}>
-            <GithubIcon className="text-default-500" />
-          </Link>
-          <ThemeSwitch />
-        </NavbarItem>
-        <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-        <NavbarItem className="hidden md:flex">
-          <Button
-            isExternal
-            as={Link}
-            className="text-sm font-normal text-default-600 bg-default-100"
-            href={siteConfig.links.sponsor}
-            startContent={<HeartFilledIcon className="text-danger" />}
-            variant="flat"
+        <a
+          className="text-[15px] font-semibold tracking-tight text-white"
+          href="#top"
+        >
+          {profile.name}
+        </a>
+
+        <ul className="hidden items-center gap-1 md:flex">
+          {siteConfig.navItems.map((item) => {
+            const isActive = active === item.href.slice(1);
+
+            return (
+              <li key={item.href} className="relative">
+                {isActive && (
+                  <motion.span
+                    className="absolute inset-0 rounded-full bg-white/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]"
+                    layoutId="nav-pill"
+                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                  />
+                )}
+                <a
+                  className={clsx(
+                    "relative block rounded-full px-3.5 py-1.5 text-[13px] transition-colors",
+                    isActive ? "text-white" : "text-white/70 hover:text-white",
+                  )}
+                  href={item.href}
+                >
+                  {item.label}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+
+        <div className="flex items-center gap-1">
+          <a
+            aria-label="GitHub"
+            className="hidden rounded-full p-2 text-white/80 transition hover:bg-white/10 hover:text-white sm:block"
+            href={profile.github}
+            rel="noreferrer"
+            target="_blank"
           >
-            Sponsor
-          </Button>
-        </NavbarItem>
-      </NavbarContent>
-
-      <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
-        <Link isExternal aria-label="Github" href={siteConfig.links.github}>
-          <GithubIcon className="text-default-500" />
-        </Link>
-        <ThemeSwitch />
-        <NavbarMenuToggle />
-      </NavbarContent>
-
-      <NavbarMenu>
-        {searchInput}
-        <div className="mx-4 mt-2 flex flex-col gap-2">
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
-              <Link
-                color={
-                  index === 2
-                    ? "primary"
-                    : index === siteConfig.navMenuItems.length - 1
-                      ? "danger"
-                      : "foreground"
-                }
-                href="#"
-                size="lg"
-              >
-                {item.label}
-              </Link>
-            </NavbarMenuItem>
-          ))}
+            <GithubIcon size={18} />
+          </a>
+          <a
+            className="hidden rounded-full bg-white px-4 py-1.5 text-[13px] font-medium text-black transition hover:bg-white/85 sm:block"
+            href={profile.resume}
+            rel="noreferrer"
+            target="_blank"
+          >
+            Resume
+          </a>
+          <button
+            aria-expanded={open}
+            aria-label="Menu"
+            className="rounded-full p-2 text-white md:hidden"
+            onClick={() => setOpen((v) => !v)}
+          >
+            <svg fill="none" height="20" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" viewBox="0 0 24 24" width="20">
+              {open ? (
+                <path d="M6 6l12 12M18 6L6 18" />
+              ) : (
+                <path d="M4 8h16M4 16h16" />
+              )}
+            </svg>
+          </button>
         </div>
-      </NavbarMenu>
-    </HeroUINavbar>
+      </Glass>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            className="absolute inset-x-4 top-16 md:hidden"
+            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+            transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
+          >
+            <Glass strong className="rounded-3xl p-2">
+              {siteConfig.navItems.map((item) => (
+                <a
+                  key={item.href}
+                  className="block rounded-2xl px-4 py-3 text-white/90 hover:bg-white/10"
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                >
+                  {item.label}
+                </a>
+              ))}
+              <a
+                className="mt-1 block rounded-2xl bg-white px-4 py-3 text-center font-medium text-black"
+                href={profile.resume}
+                rel="noreferrer"
+                target="_blank"
+              >
+                Download Resume
+              </a>
+            </Glass>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </header>
   );
-};
+}
