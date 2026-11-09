@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { Glass } from "@/components/glass";
 import { GithubIcon, LinkedInIcon } from "@/components/icons";
+import { Logo } from "@/components/logo";
 import { profile } from "@/config/resume";
 import { siteConfig } from "@/config/site";
 
@@ -50,10 +51,15 @@ export function Navbar() {
         className="flex w-full max-w-4xl items-center justify-between gap-2 rounded-full py-2 pl-5 pr-2"
       >
         <a
-          className="text-[15px] font-semibold tracking-tight text-ink"
+          aria-label={`${profile.name}, back to top`}
+          className="flex items-center gap-2.5 text-ink"
           href="#top"
         >
-          {profile.name}
+          <Logo className="text-[22px]" />
+          <span aria-hidden className="h-4 w-px bg-ink/30" />
+          <span className="text-[15px] font-semibold tracking-tight">
+            {profile.name}
+          </span>
         </a>
 
         <ul className="hidden items-center gap-0.5 md:flex">
