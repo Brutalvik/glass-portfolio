@@ -17,11 +17,11 @@ export const siteConfig = {
   description:
     "Senior Full Stack Developer in Calgary with 12+ years across React, Angular, React Native, Node.js, NestJS, Spring Boot, SQL and NoSQL, Azure and AWS.",
   navItems: [
-    { label: "About", href: "#about" },
-    { label: "Skills", href: "#skills" },
-    { label: "Experience", href: "#experience" },
-    { label: "Projects", href: "#projects" },
-    { label: "Education", href: "#education" },
-    { label: "Contact", href: "#contact" },
+    { label: "About", href: "/#about" },
+    { label: "Skills", href: "/#skills" },
+    { label: "Experience", href: "/#experience" },
+    { label: "Projects", href: "/#projects" },
+    { label: "Education", href: "/#education" },
+    { label: "Contact", href: "/#contact" },
   ],
 };

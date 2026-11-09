@@ -50,6 +50,8 @@ export type Project = {
   links?: { label: string; href: string }[];
   featured?: boolean;
   note?: string;
+  /** Slug of a long-form case study at /projects/<slug> */
+  caseStudy?: string;
 };
 
 export const profile = {
@@ -60,6 +62,14 @@ export const profile = {
   github: "https://github.com/Brutalvik",
   linkedin: "https://www.linkedin.com/in/vbytes/",
   resume: "/Vikram_Kumar_Resume.pdf",
+  /** Short "Now" status shown in the hero. Keep it current. */
+  now: "AI code evaluation at Mercor. Open to senior full-stack roles in Calgary or remote.",
+  /**
+   * Cal.com or Calendly booking link for the "Book a call" modal, e.g.
+   * https://cal.com/your-name/30min or https://calendly.com/your-name/30min.
+   * Set NEXT_PUBLIC_BOOKING_URL; the button is hidden until it is set.
+   */
+  booking: process.env.NEXT_PUBLIC_BOOKING_URL ?? "",
   tagline:
     "I design and ship end-to-end products: polished React, Angular and React Native interfaces on top of typed Node.js, NestJS and Spring Boot services, relational and NoSQL data, and Azure / AWS platforms that hold up in production.",
   summary: [
@@ -604,6 +614,7 @@ export const education = [
 export const projects: Project[] = [
   {
     id: "torqlab",
+    caseStudy: "torqlab",
     name: "TorqLab Automotive",
     kind: "Web",
     status: "Live business",
@@ -633,6 +644,7 @@ export const projects: Project[] = [
   },
   {
     id: "cervv",
+    caseStudy: "cervv",
     name: "Cervv",
     kind: "Mobile",
     status: "In development",
@@ -799,6 +811,7 @@ export const projects: Project[] = [
   },
   {
     id: "aer-bulk",
+    caseStudy: "aer-bulk-submission",
     name: "Regulatory Bulk Submission",
     kind: "Enterprise",
     status: "Production, Alberta Energy Regulator",
