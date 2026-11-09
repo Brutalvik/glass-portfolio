@@ -1,3 +1,4 @@
+import { BookCallButton } from "@/components/booking";
 import { CompanyMark } from "@/components/company-mark";
 import { Glass } from "@/components/glass";
 import { Reveal } from "@/components/reveal";
@@ -26,12 +27,14 @@ export function Hero() {
       id="top"
     >
       <Reveal>
-        <Glass className="mx-auto mb-8 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[13px] text-ink/85">
+        <Glass className="mx-auto mb-8 inline-flex max-w-full items-center gap-2.5 rounded-full px-4 py-1.5 text-[13px] text-ink/85">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
           </span>
-          Open to new roles - {profile.location}
+          <span className="font-semibold text-ink">Now</span>
+          <span aria-hidden className="h-3.5 w-px bg-ink/25" />
+          <span className="text-left">{profile.now}</span>
         </Glass>
       </Reveal>
 
@@ -73,6 +76,7 @@ export function Hero() {
           >
             Get in touch
           </Glass>
+          <BookCallButton className="glass glass-interactive inline-flex items-center gap-2 rounded-full px-6 py-3 text-[15px] font-medium text-ink" />
         </div>
       </Reveal>
 
