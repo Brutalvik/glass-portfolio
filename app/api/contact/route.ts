@@ -75,8 +75,9 @@ export async function POST(req: Request) {
 
   const { name, email, message } = parsed.data;
   const msg = { name, email, message };
-  const note = notification(msg, { receivedAt: new Date() });
-  const reply = autoReply(msg);
+  const receivedAt = new Date();
+  const note = notification(msg, { receivedAt });
+  const reply = autoReply(msg, { receivedAt });
 
   try {
     // Notify me first; only confirm to the sender once that succeeds
