@@ -62,7 +62,6 @@ const personJsonLd = {
   name: profile.name,
   jobTitle: profile.title,
   url: siteConfig.url,
-  email: `mailto:${profile.email}`,
   address: {
     "@type": "PostalAddress",
     addressLocality: "Calgary",

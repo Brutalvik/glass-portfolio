@@ -68,7 +68,7 @@ test.describe("contact form", () => {
     await page.getByRole("button", { name: "Send message" }).click();
 
     await expect(page.getByText(/Could not send right now\./)).toBeVisible();
-    await expect(page.locator("#contact").getByRole("link", { name: /@gmail\.com/ }).last()).toBeVisible();
+    await expect(page.locator("form").getByRole("link", { name: "LinkedIn" })).toBeVisible();
   });
 });
 

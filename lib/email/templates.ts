@@ -206,7 +206,6 @@ const signature = () => {
         </td>
       </tr></table>
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:18px;"><tr>
-        <td style="padding:0 8px 8px 0;">${chip(`mailto:${profile.email}`, esc(profile.email))}</td>
         <td style="padding:0 8px 8px 0;">${chip(profile.linkedin, "LinkedIn")}</td>
         <td style="padding:0 0 8px 0;">${chip(profile.github, "GitHub")}</td>
       </tr></table>
@@ -342,7 +341,6 @@ Talk soon,
 ${profile.name}
 ${profile.title}
 ${profile.location}
-${profile.email}
 LinkedIn: ${profile.linkedin}
 GitHub:   ${profile.github}
 `;

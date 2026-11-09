@@ -180,9 +180,14 @@ export function ContactForm() {
       <p aria-live="polite" className="min-h-5 text-[13px] text-ink/70">
         {status === "error" && (
           <>
-            {error} You can also email me at{" "}
-            <a className="underline" href={`mailto:${profile.email}`}>
-              {profile.email}
+            {error} You can also reach me on{" "}
+            <a
+              className="underline"
+              href={profile.linkedin}
+              rel="noreferrer"
+              target="_blank"
+            >
+              LinkedIn
             </a>
             .
           </>
