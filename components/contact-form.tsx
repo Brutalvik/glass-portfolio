@@ -6,50 +6,48 @@ import { useState } from "react";
 
 import { profile } from "@/config/resume";
 
-/**
- * Sends through Formspree when NEXT_PUBLIC_FORMSPREE_ID is set
- * (create a free form at formspree.io and copy its ID, e.g. "xyzabcd").
- * Without it, the form opens the visitor's mail app with the message filled in.
- */
-const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID;
-
 type Status = "idle" | "sending" | "sent" | "error";
 
+/**
+ * Posts to /api/contact, which emails me through Nodemailer and sends the
+ * visitor a confirmation. SMTP settings live in server environment variables.
+ */
 export function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
+  const [error, setError] = useState("");
+  const [sentTo, setSentTo] = useState("");
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
-    const data = new FormData(form);
-
-    if (data.get("_gotcha")) return; // honeypot
-
-    if (!FORMSPREE_ID) {
-      const subject = encodeURIComponent(
-        `Portfolio enquiry from ${data.get("name")}`,
-      );
-      const body = encodeURIComponent(
-        `${data.get("message")}\n\n${data.get("name")}\n${data.get("email")}`,
-      );
-
-      window.location.href = `mailto:${profile.email}?subject=${subject}&body=${body}`;
-
-      return;
-    }
+    const data = Object.fromEntries(new FormData(form)) as Record<
+      string,
+      string
+    >;
 
     setStatus("sending");
-    try {
-      const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
-        method: "POST",
-        body: data,
-        headers: { Accept: "application/json" },
-      });
+    setError("");
 
-      if (!res.ok) throw new Error(String(res.status));
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const json = (await res.json().catch(() => ({}))) as { error?: string };
+
+      if (!res.ok) {
+        setError(json.error ?? "Something went wrong.");
+        setStatus("error");
+
+        return;
+      }
+
+      setSentTo(data.email);
       setStatus("sent");
       form.reset();
     } catch {
+      setError("Network error.");
       setStatus("error");
     }
   };
@@ -60,10 +58,34 @@ export function ContactForm() {
         aria-live="polite"
         className="flex flex-col justify-center rounded-3xl bg-ink/5 p-8 text-center"
       >
-        <p className="text-xl font-semibold text-ink">
-          Thanks, message received.
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-white">
+          <svg
+            aria-hidden
+            fill="none"
+            height="22"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2.4"
+            viewBox="0 0 24 24"
+            width="22"
+          >
+            <path d="M5 12.5l4.5 4.5L19 7.5" />
+          </svg>
+        </div>
+        <p className="mt-4 text-xl font-semibold text-ink">Message sent.</p>
+        <p className="mt-2 text-ink/70">
+          A confirmation is on its way to{" "}
+          <span className="font-medium text-ink">{sentTo}</span>. I&apos;ll
+          reply within one business day.
         </p>
-        <p className="mt-2 text-ink/70">I usually reply within a day.</p>
+        <button
+          className="mx-auto mt-6 rounded-full bg-ink/10 px-4 py-2 text-[13px] font-medium text-ink transition hover:bg-ink/15"
+          type="button"
+          onClick={() => setStatus("idle")}
+        >
+          Send another
+        </button>
       </div>
     );
   }
@@ -78,6 +100,7 @@ export function ContactForm() {
         autoComplete="name"
         className="field"
         id="cf-name"
+        maxLength={100}
         name="name"
         placeholder="Your name"
       />
@@ -89,6 +112,7 @@ export function ContactForm() {
         autoComplete="email"
         className="field"
         id="cf-email"
+        maxLength={200}
         name="email"
         placeholder="you@company.com"
         type="email"
@@ -100,16 +124,24 @@ export function ContactForm() {
         required
         className="field min-h-36 resize-y"
         id="cf-message"
+        maxLength={5000}
+        minLength={10}
         name="message"
         placeholder="What are you working on?"
       />
-      <input
+      {/* Honeypot, hidden from people and screen readers */}
+      <div
         aria-hidden
-        autoComplete="off"
-        className="hidden"
-        name="_gotcha"
-        tabIndex={-1}
-      />
+        className="absolute -left-[9999px] h-0 w-0 overflow-hidden"
+      >
+        <label htmlFor="cf-company">Company</label>
+        <input
+          autoComplete="off"
+          id="cf-company"
+          name="company"
+          tabIndex={-1}
+        />
+      </div>
       <button
         className="mt-1 rounded-full bg-ink px-6 py-3 text-[15px] font-medium text-paper transition hover:opacity-85 disabled:opacity-60"
         disabled={status === "sending"}
@@ -117,10 +149,10 @@ export function ContactForm() {
       >
         {status === "sending" ? "Sending..." : "Send message"}
       </button>
-      <p aria-live="polite" className="min-h-5 text-[13px] text-ink/65">
+      <p aria-live="polite" className="min-h-5 text-[13px] text-ink/70">
         {status === "error" && (
           <>
-            Something went wrong. Email me directly at{" "}
+            {error} You can also email me at{" "}
             <a className="underline" href={`mailto:${profile.email}`}>
               {profile.email}
             </a>
