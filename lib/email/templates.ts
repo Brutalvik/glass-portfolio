@@ -84,7 +84,7 @@ const hero = ({
               <td align="left" valign="middle">
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
                   <td width="40" height="40" align="center" valign="middle"
-                      style="width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.45);font-family:${FONT};font-size:15px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">VK</td>
+                      style="width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.45);font-family:${FONT};font-size:16px;font-weight:800;color:#ffffff;letter-spacing:-1px;">vk.</td>
                   <td style="padding-left:12px;font-family:${FONT};font-size:15px;font-weight:600;color:#ffffff;">${esc(profile.name)}</td>
                 </tr></table>
               </td>
@@ -198,7 +198,7 @@ const signature = () => {
     <td style="padding:26px 26px 24px 26px;font-family:${FONT};">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
         <td width="56" height="56" align="center" valign="middle" bgcolor="${C.blue}"
-            style="width:56px;height:56px;border-radius:16px;background:${C.blue};background-image:linear-gradient(135deg,${C.blue},${C.violet});font-size:20px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">VK</td>
+            style="width:56px;height:56px;border-radius:16px;background:${C.blue};background-image:linear-gradient(135deg,${C.blue},${C.violet});font-size:22px;font-weight:800;color:#ffffff;letter-spacing:-1.2px;">vk.</td>
         <td style="padding-left:16px;">
           <div style="font-size:19px;line-height:24px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">${esc(profile.name)}</div>
           <div style="font-size:14px;line-height:20px;color:rgba(255,255,255,0.75);">${esc(profile.title)}</div>

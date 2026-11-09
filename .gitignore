@@ -38,3 +38,8 @@ pnpm-lock.yaml
 yarn.lock
 package-lock.json
 bun.lockb
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/
+.og-tmp.html

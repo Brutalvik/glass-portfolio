@@ -2,9 +2,19 @@
 
 import type { FormEvent } from "react";
 
+import Script from "next/script";
 import { useState } from "react";
 
 import { profile } from "@/config/resume";
+
+/** Cloudflare Turnstile site key; the invisible check is skipped when unset */
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+
+declare global {
+  interface Window {
+    turnstile?: { reset: (el?: string | HTMLElement) => void };
+  }
+}
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -37,6 +47,7 @@ export function ContactForm() {
       const json = (await res.json().catch(() => ({}))) as { error?: string };
 
       if (!res.ok) {
+        window.turnstile?.reset();
         setError(json.error ?? "Something went wrong.");
         setStatus("error");
 
@@ -142,6 +153,23 @@ export function ContactForm() {
           tabIndex={-1}
         />
       </div>
+      {TURNSTILE_SITE_KEY && (
+        <>
+          <Script
+            async
+            defer
+            src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+            strategy="lazyOnload"
+          />
+          {/* Invisible unless Cloudflare needs the visitor to interact */}
+          <div
+            className="cf-turnstile"
+            data-appearance="interaction-only"
+            data-sitekey={TURNSTILE_SITE_KEY}
+            data-theme="auto"
+          />
+        </>
+      )}
       <button
         className="mt-1 rounded-full bg-ink px-6 py-3 text-[15px] font-medium text-paper transition hover:opacity-85 disabled:opacity-60"
         disabled={status === "sending"}

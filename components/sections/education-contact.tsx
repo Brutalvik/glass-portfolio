@@ -1,3 +1,4 @@
+import { BookCallButton } from "@/components/booking";
 import { ContactForm } from "@/components/contact-form";
 import { Glass } from "@/components/glass";
 import { GithubIcon, LinkedInIcon } from "@/components/icons";
@@ -56,6 +57,9 @@ export function Contact() {
               >
                 {profile.email}
               </a>
+              <BookCallButton className="inline-flex w-fit items-center gap-2 rounded-full bg-ink/10 px-5 py-3 text-[15px] font-medium text-ink transition hover:bg-ink/15">
+                Book a 30-minute call
+              </BookCallButton>
               <div className="flex flex-wrap gap-2">
                 {links.map(({ label, href, Icon }) => (
                   <a

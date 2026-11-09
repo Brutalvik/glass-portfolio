@@ -5,6 +5,7 @@ import { Metadata, Viewport } from "next";
 import { Providers } from "./providers";
 
 import { Navbar } from "@/components/navbar";
+import { PrintResume } from "@/components/print-resume";
 import { TimeBackground } from "@/components/time-background";
 import { TimeControl } from "@/components/time-control";
 import { sceneBootScript } from "@/config/background-map";
@@ -116,6 +117,7 @@ export default function RootLayout({
           </main>
           <TimeControl />
         </Providers>
+        <PrintResume />
       </body>
     </html>
   );

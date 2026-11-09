@@ -2,6 +2,7 @@
 
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { Glass } from "@/components/glass";
@@ -16,7 +17,7 @@ export function Navbar() {
 
   useEffect(() => {
     const els = siteConfig.navItems
-      .map((i) => document.getElementById(i.href.slice(1)))
+      .map((i) => document.getElementById(i.href.split("#")[1]))
       .filter(Boolean) as HTMLElement[];
 
     const io = new IntersectionObserver(
@@ -50,21 +51,21 @@ export function Navbar() {
         as="nav"
         className="flex w-full max-w-4xl items-center justify-between gap-2 rounded-full py-2 pl-5 pr-2"
       >
-        <a
+        <Link
           aria-label={`${profile.name}, back to top`}
           className="flex items-center gap-2.5 text-ink"
-          href="#top"
+          href="/#top"
         >
           <Logo className="text-[22px]" />
           <span aria-hidden className="h-4 w-px bg-ink/30" />
           <span className="text-[15px] font-semibold tracking-tight">
             {profile.name}
           </span>
-        </a>
+        </Link>
 
         <ul className="hidden items-center gap-0.5 md:flex">
           {siteConfig.navItems.map((item) => {
-            const isActive = active === item.href.slice(1);
+            const isActive = active === item.href.split("#")[1];
 
             return (
               <li key={item.href} className="relative">

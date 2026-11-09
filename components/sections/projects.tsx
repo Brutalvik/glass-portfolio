@@ -1,6 +1,7 @@
 "use client";
 
 import clsx from "clsx";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 
@@ -80,10 +81,24 @@ function ProjectCard({ project }: { project: Project }) {
       </div>
 
       <div className="mt-auto flex flex-wrap items-center gap-2 pt-6">
+        {project.caseStudy && (
+          <Link
+            className="inline-flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-[13px] font-medium text-paper transition hover:opacity-85"
+            href={`/projects/${project.caseStudy}`}
+          >
+            Read case study
+            <Arrow />
+          </Link>
+        )}
         {project.links?.map((l) => (
           <a
             key={l.href}
-            className="inline-flex items-center gap-1.5 rounded-full bg-ink px-4 py-2 text-[13px] font-medium text-paper transition hover:opacity-85"
+            className={clsx(
+              "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-medium transition",
+              project.caseStudy
+                ? "bg-ink/10 text-ink hover:bg-ink/15"
+                : "bg-ink text-paper hover:opacity-85",
+            )}
             href={l.href}
             rel="noreferrer"
             target="_blank"
