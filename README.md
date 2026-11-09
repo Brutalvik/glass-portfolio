@@ -1,49 +1,81 @@
 # Vikram Kumar - Portfolio
 
-Single-page portfolio with an Apple-style liquid glass UI over a time-of-day landscape.
+Single-page portfolio with an Apple-style liquid glass UI over a landscape that follows the visitor's time of day. Daytime scenes switch to light glass, evening and night scenes to dark glass.
 
 ## Stack
 
-- Next.js 15 (App Router), React 18, TypeScript
-- Tailwind CSS 4, Framer Motion
+- Next.js 15 (App Router, fully static), React 18, TypeScript
+- Tailwind CSS 4 (CSS-first config in `styles/globals.css`), Framer Motion
 - Self-hosted Inter (`@fontsource-variable/inter`), SF Pro on Apple devices
 
 ## Structure
 
 ```
 app/
-  layout.tsx            Background, navbar, metadata
-  page.tsx              Section composition
+  layout.tsx            Metadata, JSON-LD, scene boot script, providers
+  page.tsx              Section order
+  sitemap.ts, robots.ts SEO routes
+  icon.svg, apple-icon.png
 components/
   glass.tsx             <Glass> surface with pointer-following highlight
-  time-background.tsx   Hour-based background with crossfade
-  navbar.tsx            Floating glass nav with active-section pill
-  reveal.tsx            Scroll reveal + section heading
-  sections/             hero, about, skills, experience, education-contact
+  scene-provider.tsx    Current scene (clock or manual) and light/dark theme
+  time-background.tsx   Responsive background with crossfade
+  time-control.tsx      Floating time-of-day slider
+  skill-focus.tsx       Selected-skill state shared by skills, experience, projects
+  company-mark.tsx      Company wordmarks and tiles (uses logo files when provided)
+  contact-form.tsx      Formspree form with mailto fallback
+  sections/             hero, about, skills, experience, projects, education-contact
 config/
-  resume.ts             All content: profile, skill groups, roles, education
-  background-map.ts     Hour -> background mapping
-  site.ts               Site name and nav
+  resume.ts             All content: profile, companies, skills, roles, projects, education
+  background-map.ts     Scenes, hours, and light/dark theme per scene
+  site.ts               Site URL, title, nav
+lib/
+  skill-index.ts        Maps each skill to the roles and projects that use it
 public/
-  bg/                   2560px WebP backgrounds + LQIP placeholders
+  bg/                   <scene>-1280.webp, <scene>-2560.webp, <scene>-lqip.webp
+  og.jpg                Link preview image
   Vikram_Kumar_Resume.pdf
-styles/globals.css      Glass tokens and utilities (.glass, .chip, .text-gradient)
+scripts/build-images.py Regenerates background sizes
 ```
 
 ## Editing content
 
-Everything shown on the page lives in `config/resume.ts`. Add a skill to a group's `skills` array, or a role to `experience`, and the page updates.
+Everything on the page comes from `config/resume.ts`.
+
+- **Skills to experience links**: clicking a skill highlights the roles and projects that mention it. Matching uses the skill name; for descriptive skills, add search terms in `lib/skill-index.ts`. A role's `keywords` array adds resume terms used for matching without displaying them.
+- **Company logos**: drop official logo files (SVG preferred) into `public/logos/` and set `logo: "/logos/ibm.svg"` on the company. Logos are rendered monochrome and adapt to light and dark glass. Without a logo, a neutral wordmark is shown.
+
+## Environment
+
+Copy `.env.example` to `.env.local` for local overrides.
+
+| Variable | Purpose |
+| --- | --- |
+| `NEXT_PUBLIC_SITE_URL` | Canonical URL for metadata, sitemap, Open Graph. Falls back to the Vercel production URL. |
+| `NEXT_PUBLIC_FORMSPREE_ID` | Formspree form ID for the contact form. Without it the form opens the visitor's mail app. |
+
+## Deploying to Vercel
+
+1. Import `Brutalvik/glass-portfolio` at vercel.com/new. Framework preset: Next.js, no build settings needed.
+2. Add `NEXT_PUBLIC_FORMSPREE_ID` (and `NEXT_PUBLIC_SITE_URL` if using a custom domain).
+3. Deploy. Every push to `main` redeploys; pull requests get preview URLs.
 
 ## Glass notes
 
-- `.glass` uses `backdrop-filter: blur() saturate()` plus a masked gradient rim and inset highlights.
-- Do not put a CSS `filter`, `opacity < 1` animation wrapper with `filter`, or another `backdrop-filter` on an ancestor of a `.glass` element; it stops the blur from sampling the page.
+- `.glass` uses `backdrop-filter: blur() saturate()` plus a masked gradient rim and inset highlights. Colors come from CSS variables that switch with `data-theme`.
+- Never put `filter`, `mask`, `backdrop-filter`, or a resting `opacity < 1` on an ancestor of a `.glass` element; it stops the blur from sampling the page. To dim a card, dim its children (`.is-dimmed > *`).
 - Body has no background on purpose: it would paint over the fixed `-z-10` backdrop.
+- `prefers-reduced-transparency` swaps glass for solid panels; `prefers-reduced-motion` disables drift and lift animations.
 
 ## Scripts
 
 ```bash
 npm install
-npm run dev
-npm run build && npm start
+npm run dev          # local dev
+npm run lint         # ESLint
+npm run typecheck    # tsc --noEmit
+npm run build        # production build
+npm run images -- <dir>   # rebuild background sizes from source images named <scene>.png
 ```
+
+CI (`.github/workflows/ci.yml`) runs lint, typecheck, and build on every pull request.
