@@ -1,4 +1,6 @@
 import * as React from "react";
+import { IconBaseProps } from "react-icons";
+import { FaLinkedin } from "react-icons/fa6";
 
 import { IconSvgProps } from "@/types";
 
@@ -25,26 +27,12 @@ export const GithubIcon: React.FC<IconSvgProps> = ({
   );
 };
 
-/** Generic profile-card icon used for the LinkedIn link */
+/** LinkedIn brand icon (Font Awesome via react-icons) */
 export const LinkedInIcon: React.FC<IconSvgProps> = ({
   size = 24,
   width,
   height,
   ...props
 }) => (
-  <svg
-    fill="none"
-    height={size || height}
-    stroke="currentColor"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    strokeWidth="1.8"
-    viewBox="0 0 24 24"
-    width={size || width}
-    {...props}
-  >
-    <rect height="16" rx="3" width="18" x="3" y="4" />
-    <circle cx="9" cy="10" r="2" />
-    <path d="M6 16c.6-1.6 1.7-2.4 3-2.4s2.4.8 3 2.4M14.5 9.5h3.5M14.5 13h3.5" />
-  </svg>
+  <FaLinkedin size={size || width || height} {...(props as IconBaseProps)} />
 );

@@ -161,12 +161,12 @@ export function Navbar() {
               ))}
               <div className="mt-1 grid grid-cols-2 gap-2">
                 <a
-                  className="rounded-2xl bg-ink/10 px-4 py-3 text-center font-medium text-ink"
+                  className="flex items-center justify-center gap-2 rounded-2xl bg-ink/10 px-4 py-3 font-medium text-ink"
                   href={profile.linkedin}
                   rel="noreferrer"
                   target="_blank"
                 >
-                  LinkedIn
+                  <LinkedInIcon size={18} /> LinkedIn
                 </a>
                 <a
                   className="rounded-2xl bg-ink px-4 py-3 text-center font-medium text-paper"

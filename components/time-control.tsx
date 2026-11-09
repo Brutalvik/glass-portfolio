@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Glass } from "@/components/glass";
 import { useScene } from "@/components/scene-provider";
@@ -26,12 +26,42 @@ const SunMoon = ({ light }: { light: boolean }) => (
   </svg>
 );
 
-/** Floating control to scrub through the 12 time-of-day scenes */
+/** Live local time, ticking on the second */
+function useClock() {
+  const [now, setNow] = useState<Date | null>(null);
+
+  useEffect(() => {
+    let t: number;
+    const tick = () => {
+      setNow(new Date());
+      t = window.setTimeout(tick, 1000 - (Date.now() % 1000));
+    };
+
+    tick();
+
+    return () => window.clearTimeout(t);
+  }, []);
+
+  return now;
+}
+
+const fmtTime = (d: Date, seconds = false) =>
+  d.toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+    ...(seconds ? { second: "2-digit" } : {}),
+  });
+
+const fmtDate = (d: Date) =>
+  d.toLocaleDateString([], { weekday: "long", month: "long", day: "numeric" });
+
+/** Floating clock + control to scrub through the 12 time-of-day scenes */
 export function TimeControl() {
   const { index, scene, live, setIndex } = useScene();
   const [open, setOpen] = useState(false);
+  const now = useClock();
 
-  if (index < 0) return null;
+  if (index < 0 || !now) return null;
 
   return (
     <div className="fixed bottom-4 right-4 z-40 flex flex-col items-end gap-2">
@@ -44,11 +74,16 @@ export function TimeControl() {
             transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
           >
             <Glass strong className="w-72 rounded-3xl p-4">
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between">
                 <div>
-                  <p className="eyebrow">Time of day</p>
-                  <p className="mt-1 text-[15px] font-semibold text-ink">
-                    {scene.label}
+                  <p className="eyebrow">
+                    {live ? "Your local time" : "Previewing"}
+                  </p>
+                  <p className="mt-1 text-[34px] font-semibold leading-none tracking-tight text-ink tabular-nums">
+                    {fmtTime(now)}
+                  </p>
+                  <p className="mt-1.5 text-[13px] text-ink/65">
+                    {fmtDate(now)}
                   </p>
                 </div>
                 <button
@@ -59,6 +94,7 @@ export function TimeControl() {
                       ? "bg-ink text-paper"
                       : "bg-ink/10 text-ink hover:bg-ink/15",
                   )}
+                  type="button"
                   onClick={() => setIndex(null)}
                 >
                   <span
@@ -69,6 +105,11 @@ export function TimeControl() {
                   />
                   Live
                 </button>
+              </div>
+              <div className="mt-4 flex items-center gap-2 rounded-2xl bg-ink/8 px-3 py-2 text-[13px] text-ink">
+                <SunMoon light={scene.theme === "light"} />
+                <span className="font-medium">{scene.label}</span>
+                {!live && <span className="text-ink/55">scene</span>}
               </div>
               <label className="mt-4 block">
                 <span className="sr-only">Scene</span>
@@ -101,13 +142,18 @@ export function TimeControl() {
         interactive
         strong
         aria-expanded={open}
-        aria-label={`Time of day: ${scene.label}. Change scene`}
+        aria-label={`${fmtTime(now)}, ${scene.label}. Change scene`}
         as="button"
         className="flex h-11 items-center gap-2 rounded-full px-4 text-[13px] font-medium text-ink"
         onClick={() => setOpen((v) => !v)}
       >
         <SunMoon light={scene.theme === "light"} />
-        <span className="hidden sm:inline">{scene.label}</span>
+        <span className="tabular-nums">{fmtTime(now)}</span>
+        <span
+          aria-hidden
+          className="hidden h-3.5 w-px bg-ink/25 sm:inline-block"
+        />
+        <span className="hidden text-ink/75 sm:inline">{scene.label}</span>
       </Glass>
     </div>
   );

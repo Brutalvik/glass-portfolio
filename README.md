@@ -14,16 +14,17 @@ Single-page portfolio with an Apple-style liquid glass UI over a landscape that 
 app/
   layout.tsx            Metadata, JSON-LD, scene boot script, providers
   page.tsx              Section order
+  api/contact/route.ts  Nodemailer: notifies me, sends the visitor a confirmation
   sitemap.ts, robots.ts SEO routes
   icon.svg, apple-icon.png
 components/
   glass.tsx             <Glass> surface with pointer-following highlight
   scene-provider.tsx    Current scene (clock or manual) and light/dark theme
   time-background.tsx   Responsive background with crossfade
-  time-control.tsx      Floating time-of-day slider
   skill-focus.tsx       Selected-skill state shared by skills, experience, projects
   company-mark.tsx      Company wordmarks and tiles (uses logo files when provided)
-  contact-form.tsx      Formspree form with mailto fallback
+  contact-form.tsx      Contact form posting to /api/contact
+  time-control.tsx      Live clock + time-of-day slider
   sections/             hero, about, skills, experience, projects, education-contact
 config/
   resume.ts             All content: profile, companies, skills, roles, projects, education
@@ -31,6 +32,7 @@ config/
   site.ts               Site URL, title, nav
 lib/
   skill-index.ts        Maps each skill to the roles and projects that use it
+  email/                SMTP transport and Apple-style HTML email templates
 public/
   bg/                   <scene>-1280.webp, <scene>-2560.webp, <scene>-lqip.webp
   og.jpg                Link preview image
@@ -51,13 +53,24 @@ Copy `.env.example` to `.env.local` for local overrides.
 
 | Variable | Purpose |
 | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | Canonical URL for metadata, sitemap, Open Graph. Falls back to the Vercel production URL. |
-| `NEXT_PUBLIC_FORMSPREE_ID` | Formspree form ID for the contact form. Without it the form opens the visitor's mail app. |
+| `NEXT_PUBLIC_SITE_URL` | Canonical URL for metadata, sitemap, Open Graph, and email links. Falls back to the Vercel production URL. |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE` | SMTP server. Gmail: `smtp.gmail.com`, `465`, `true`. |
+| `SMTP_USER`, `SMTP_PASS` | SMTP login. For Gmail use an App Password, not your normal password. |
+| `MAIL_FROM` | Sender shown on both emails, e.g. `Vikram Kumar <you@gmail.com>`. |
+| `CONTACT_TO` | Where new-message notifications go. Defaults to the profile email. |
+
+### Contact form flow
+
+1. Visitor submits the form; `POST /api/contact` validates it (zod), checks a honeypot, and rate-limits per IP.
+2. A notification is emailed to `CONTACT_TO` with the visitor as Reply-To.
+3. Only if that succeeds, the visitor gets a branded confirmation email with a copy of their message and a signature.
+
+Without SMTP variables the API returns 503 and the form tells the visitor to email directly.
 
 ## Deploying to Vercel
 
 1. Import `Brutalvik/glass-portfolio` at vercel.com/new. Framework preset: Next.js, no build settings needed.
-2. Add `NEXT_PUBLIC_FORMSPREE_ID` (and `NEXT_PUBLIC_SITE_URL` if using a custom domain).
+2. Add the SMTP variables above (and `NEXT_PUBLIC_SITE_URL` if using a custom domain).
 3. Deploy. Every push to `main` redeploys; pull requests get preview URLs.
 
 ## Glass notes

@@ -8,9 +8,9 @@
 [data-theme="dark"] {
   --ink: #ffffff;
   --paper: #0b0d17;
-  --glass-tint: rgba(16, 18, 28, 0.26);
-  --glass-tint-strong: rgba(16, 18, 28, 0.42);
-  --glass-sheen-a: rgba(255, 255, 255, 0.16);
+  --glass-tint: rgba(16, 18, 28, 0.32);
+  --glass-tint-strong: rgba(16, 18, 28, 0.46);
+  --glass-sheen-a: rgba(255, 255, 255, 0.2);
   --glass-sheen-b: rgba(255, 255, 255, 0.05);
   --glass-sheen-c: rgba(255, 255, 255, 0.09);
   --glass-edge: rgba(255, 255, 255, 0.22);
@@ -35,8 +35,8 @@
 [data-theme="light"] {
   --ink: #0e1222;
   --paper: #ffffff;
-  --glass-tint: rgba(255, 255, 255, 0.34);
-  --glass-tint-strong: rgba(255, 255, 255, 0.5);
+  --glass-tint: rgba(255, 255, 255, 0.42);
+  --glass-tint-strong: rgba(255, 255, 255, 0.56);
   --glass-sheen-a: rgba(255, 255, 255, 0.55);
   --glass-sheen-b: rgba(255, 255, 255, 0.18);
   --glass-sheen-c: rgba(255, 255, 255, 0.3);
@@ -68,8 +68,8 @@
 }
 
 :root {
-  --glass-blur: 28px;
-  --glass-sat: 180%;
+  --glass-blur: 44px;
+  --glass-sat: 200%;
   --ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
@@ -136,6 +136,7 @@ body {
     inset 0 1px 0 0 var(--glass-inset),
     inset 0 -1px 0 0 color-mix(in oklab, var(--glass-inset) 18%, transparent),
     inset 1px 0 0 0 color-mix(in oklab, var(--glass-inset) 30%, transparent),
+    inset 0 0 24px 0 color-mix(in oklab, var(--glass-inset) 10%, transparent),
     0 1px 2px rgba(0, 0, 0, 0.1),
     0 20px 50px -18px var(--glass-shadow);
   overflow: hidden;
@@ -191,7 +192,7 @@ body {
 
 .glass-strong {
   --glass-tint: var(--glass-tint-strong);
-  --glass-blur: 40px;
+  --glass-blur: 64px;
 }
 
 .glass-interactive {
