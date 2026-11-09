@@ -1,17 +1,16 @@
+import "@fontsource-variable/inter";
 import "@/styles/globals.css";
 import { Metadata, Viewport } from "next";
-import { Link } from "@heroui/link";
-import clsx from "clsx";
 
 import { Providers } from "./providers";
 
 import { siteConfig } from "@/config/site";
-import { fontSans } from "@/config/fonts";
 import { Navbar } from "@/components/navbar";
+import { TimeBackground } from "@/components/time-background";
 
 export const metadata: Metadata = {
   title: {
-    default: siteConfig.name,
+    default: `${siteConfig.name} - Senior Full Stack Developer`,
     template: `%s - ${siteConfig.name}`,
   },
   description: siteConfig.description,
@@ -21,10 +20,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
-  ],
+  themeColor: "#0b0d17",
 };
 
 export default function RootLayout({
@@ -33,32 +29,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html suppressHydrationWarning lang="en">
+    <html suppressHydrationWarning className="dark" lang="en">
       <head />
-      <body
-        className={clsx(
-          "min-h-screen text-foreground bg-background font-sans antialiased",
-          fontSans.variable,
-        )}
-      >
-        <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          <div className="relative flex flex-col h-screen">
-            <Navbar />
-            <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">
-              {children}
-            </main>
-            <footer className="w-full flex items-center justify-center py-3">
-              <Link
-                isExternal
-                className="flex items-center gap-1 text-current"
-                href="https://heroui.com?utm_source=next-app-template"
-                title="heroui.com homepage"
-              >
-                <span className="text-default-600">Powered by</span>
-                <p className="text-primary">HeroUI</p>
-              </Link>
-            </footer>
-          </div>
+      <body className="min-h-screen antialiased">
+        <Providers themeProps={{ attribute: "class", forcedTheme: "dark" }}>
+          <TimeBackground />
+          <Navbar />
+          <main className="mx-auto max-w-6xl px-5 md:px-8">{children}</main>
         </Providers>
       </body>
     </html>
