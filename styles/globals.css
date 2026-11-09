@@ -424,3 +424,118 @@ button.chip[aria-pressed="true"]:hover {
     transform: none;
   }
 }
+
+/* ---------- Print: a clean, one-page-style resume ---------- */
+/* The interactive site is hidden in print and <PrintResume> is shown instead. */
+.print-only {
+  display: none;
+}
+
+@page {
+  size: letter;
+  margin: 12mm 13mm;
+}
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+    color: #111 !important;
+  }
+
+  body > *:not(.print-only) {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+    font-family: var(--font-sans);
+    font-size: 9pt;
+    line-height: 1.38;
+    color: #111;
+  }
+
+  .print-only h1 {
+    font-size: 20pt;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+
+  .print-only h2 {
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #555;
+    margin: 10pt 0 4pt;
+    padding-bottom: 2pt;
+    border-bottom: 0.75pt solid #d4d4d8;
+  }
+
+  .pr-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12pt;
+  }
+
+  .pr-title {
+    font-size: 11pt;
+    color: #444;
+    margin-top: 2pt;
+  }
+
+  .pr-contact {
+    text-align: right;
+    font-size: 8.5pt;
+    color: #444;
+  }
+
+  .pr-summary {
+    margin-top: 8pt;
+  }
+
+  .pr-skills > div {
+    display: grid;
+    grid-template-columns: 34mm 1fr;
+    gap: 6pt;
+    margin-bottom: 1.5pt;
+  }
+
+  .pr-skills dt {
+    font-weight: 600;
+  }
+
+  .pr-skills dd {
+    margin: 0;
+    color: #333;
+  }
+
+  .pr-role {
+    margin-bottom: 5pt;
+    break-inside: avoid;
+  }
+
+  .pr-role-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 10pt;
+  }
+
+  .pr-role-head span {
+    color: #555;
+    white-space: nowrap;
+    font-size: 8.5pt;
+  }
+
+  .pr-role ul {
+    margin: 2pt 0 0 0;
+    padding-left: 11pt;
+    list-style: disc;
+  }
+
+  .pr-role li {
+    margin: 0.5pt 0;
+  }
+}
