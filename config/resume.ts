@@ -58,7 +58,6 @@ export const profile = {
   name: "Vikram Kumar",
   title: "Senior Full Stack Developer",
   location: "Calgary, Alberta, Canada",
-  email: "vikautox@gmail.com",
   github: "https://github.com/Brutalvik",
   linkedin: "https://www.linkedin.com/in/vbytes/",
   resume: "/Vikram_Kumar_Resume.pdf",

@@ -51,13 +51,7 @@ export function Contact() {
               I&apos;m in {profile.location} and work remote or on-site.
             </p>
             <div className="mt-8 flex flex-col gap-3">
-              <a
-                className="inline-flex w-fit items-center rounded-full bg-ink px-5 py-3 text-[15px] font-medium text-paper transition hover:opacity-85"
-                href={`mailto:${profile.email}`}
-              >
-                {profile.email}
-              </a>
-              <BookCallButton className="inline-flex w-fit items-center gap-2 rounded-full bg-ink/10 px-5 py-3 text-[15px] font-medium text-ink transition hover:bg-ink/15">
+              <BookCallButton className="inline-flex w-fit items-center gap-2 rounded-full bg-ink px-5 py-3 text-[15px] font-medium text-paper transition hover:opacity-85">
                 Book a 30-minute call
               </BookCallButton>
               <div className="flex flex-wrap gap-2">

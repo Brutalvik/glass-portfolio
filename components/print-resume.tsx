@@ -19,8 +19,6 @@ export function PrintResume() {
         <p className="pr-contact">
           {profile.location}
           <br />
-          {profile.email}
-          <br />
           {profile.linkedin
             .replace(/^https?:\/\/(www\.)?/, "")
             .replace(/\/$/, "")}

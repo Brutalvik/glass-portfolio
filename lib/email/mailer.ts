@@ -38,7 +38,10 @@ let cachedSmtp: Transporter | null = null;
  * Returns null when neither is configured.
  */
 export function getMailer(): Mailer | null {
-  const to = process.env.CONTACT_TO ?? profile.email;
+  // Notification inbox. Never shipped to the browser; falls back to the SMTP login.
+  const to = process.env.CONTACT_TO ?? process.env.SMTP_USER;
+
+  if (!to) return null;
 
   if (process.env.RESEND_API_KEY && process.env.MAIL_FROM) {
     const resend = new Resend(process.env.RESEND_API_KEY);
