@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { getTransporter } from "@/lib/email/mailer";
+import { getMailer } from "@/lib/email/mailer";
 import { autoReply, notification } from "@/lib/email/templates";
+import { isRateLimited } from "@/lib/security/rate-limit";
+import { verifyTurnstile } from "@/lib/security/turnstile";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,33 +15,19 @@ const schema = z.object({
   message: z.string().trim().min(10, "Please write a little more").max(5000),
   // Honeypot: real visitors never fill this hidden field
   company: z.string().max(0).optional().or(z.literal("")),
+  // Cloudflare Turnstile token (field name set by the widget)
+  "cf-turnstile-response": z.string().max(4096).optional(),
 });
 
-// Best-effort rate limit: 5 messages per IP per 10 minutes.
-// In-memory, so it resets per serverless instance; enough to stop casual abuse.
-const WINDOW_MS = 10 * 60 * 1000;
-const LIMIT = 5;
-const hits = new Map<string, number[]>();
-
-const limited = (ip: string) => {
-  const now = Date.now();
-  const recent = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
-
-  recent.push(now);
-  hits.set(ip, recent);
-
-  return recent.length > LIMIT;
-};
+const fail = (error: string, status: number) =>
+  NextResponse.json({ error }, { status });
 
 export async function POST(req: Request) {
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
 
-  if (limited(ip)) {
-    return NextResponse.json(
-      { error: "Too many messages. Please try again later." },
-      { status: 429 },
-    );
+  if (await isRateLimited(`ip:${ip}`)) {
+    return fail("Too many messages. Please try again later.", 429);
   }
 
   let body: unknown;
@@ -47,7 +35,7 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+    return fail("Invalid request.", 400);
   }
 
   const parsed = schema.safeParse(body);
@@ -58,20 +46,16 @@ export async function POST(req: Request) {
     // Honeypot hit: pretend success so bots learn nothing
     if (first?.path[0] === "company") return NextResponse.json({ ok: true });
 
-    return NextResponse.json(
-      { error: first?.message ?? "Invalid input." },
-      { status: 400 },
-    );
+    return fail(first?.message ?? "Invalid input.", 400);
   }
 
-  const mail = getTransporter();
-
-  if (!mail) {
-    return NextResponse.json(
-      { error: "Email is not configured yet." },
-      { status: 503 },
-    );
+  if (!(await verifyTurnstile(parsed.data["cf-turnstile-response"], ip))) {
+    return fail("Verification failed. Please refresh and try again.", 400);
   }
+
+  const mail = getMailer();
+
+  if (!mail) return fail("Email is not configured yet.", 503);
 
   const { name, email, message } = parsed.data;
   const msg = { name, email, message };
@@ -81,31 +65,21 @@ export async function POST(req: Request) {
 
   try {
     // Notify me first; only confirm to the sender once that succeeds
-    await mail.transporter.sendMail({
-      from: mail.from,
+    await mail.send({
       to: mail.to,
       replyTo: { name, address: email },
-      subject: note.subject,
-      html: note.html,
-      text: note.text,
+      ...note,
     });
-
-    await mail.transporter.sendMail({
-      from: mail.from,
+    await mail.send({
       to: { name, address: email },
       replyTo: mail.to,
-      subject: reply.subject,
-      html: reply.html,
-      text: reply.text,
+      ...reply,
     });
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.error("contact: send failed", err);
+    console.error(`contact: send failed via ${mail.provider}`, err);
 
-    return NextResponse.json(
-      { error: "Could not send right now." },
-      { status: 502 },
-    );
+    return fail("Could not send right now.", 502);
   }
 
   return NextResponse.json({ ok: true });
